@@ -11,6 +11,7 @@ import (
 func Commands(db *gorm.DB) {
 	migrate := false
 	seed := false
+	fresh := false
 
 	for _, arg := range os.Args[1:] {
 		if arg == "--migrate" {
@@ -18,6 +19,9 @@ func Commands(db *gorm.DB) {
 		}
 		if arg == "--seed" {
 			seed = true
+		}
+		if arg == "--migrate-fresh" {
+			fresh = true
 		}
 	}
 
@@ -33,5 +37,11 @@ func Commands(db *gorm.DB) {
 			log.Fatalf("error migration seeder: %v", err)
 		}
 		log.Println("seeder completed successfully")
+	}
+	if fresh {
+		if err := migrations.Fresh(db); err != nil {
+			log.Fatalf("error migration fresh: %v", err)
+		}
+		log.Println("fresh migration completed successfully")
 	}
 }
