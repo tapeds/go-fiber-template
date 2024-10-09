@@ -60,7 +60,7 @@ func (s *userService) RegisterUser(ctx context.Context, req dto.UserCreateReques
 
 	var filename string
 
-	_, flag, _ := s.userRepo.CheckEmail(ctx, nil, req.Email)
+	_, flag, _ := s.userRepo.CheckEmail(ctx, req.Email)
 	if flag {
 		return dto.UserResponse{}, dto.ErrEmailAlreadyExists
 	}
@@ -85,7 +85,7 @@ func (s *userService) RegisterUser(ctx context.Context, req dto.UserCreateReques
 		IsVerified: false,
 	}
 
-	userReg, err := s.userRepo.RegisterUser(ctx, nil, user)
+	userReg, err := s.userRepo.RegisterUser(ctx, user)
 	if err != nil {
 		return dto.UserResponse{}, dto.ErrCreateUser
 	}
@@ -153,7 +153,7 @@ func makeVerificationEmail(receiverEmail string) (map[string]string, error) {
 }
 
 func (s *userService) SendVerificationEmail(ctx context.Context, req dto.SendVerificationEmailRequest) error {
-	user, err := s.userRepo.GetUserByEmail(ctx, nil, req.Email)
+	user, err := s.userRepo.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		return dto.ErrEmailNotFound
 	}
@@ -198,7 +198,7 @@ func (s *userService) VerifyEmail(ctx context.Context, req dto.VerifyEmailReques
 		}, dto.ErrTokenExpired
 	}
 
-	user, err := s.userRepo.GetUserByEmail(ctx, nil, email)
+	user, err := s.userRepo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return dto.VerifyEmailResponse{}, dto.ErrUserNotFound
 	}
@@ -207,7 +207,7 @@ func (s *userService) VerifyEmail(ctx context.Context, req dto.VerifyEmailReques
 		return dto.VerifyEmailResponse{}, dto.ErrAccountAlreadyVerified
 	}
 
-	updatedUser, err := s.userRepo.UpdateUser(ctx, nil, entity.User{
+	updatedUser, err := s.userRepo.UpdateUser(ctx, entity.User{
 		ID:         user.ID,
 		IsVerified: true,
 	})
@@ -222,7 +222,7 @@ func (s *userService) VerifyEmail(ctx context.Context, req dto.VerifyEmailReques
 }
 
 func (s *userService) GetAllUserWithPagination(ctx context.Context, req dto.PaginationRequest) (dto.UserPaginationResponse, error) {
-	dataWithPaginate, err := s.userRepo.GetAllUserWithPagination(ctx, nil, req)
+	dataWithPaginate, err := s.userRepo.GetAllUserWithPagination(ctx, req)
 	if err != nil {
 		return dto.UserPaginationResponse{}, err
 	}
@@ -254,7 +254,7 @@ func (s *userService) GetAllUserWithPagination(ctx context.Context, req dto.Pagi
 }
 
 func (s *userService) GetUserById(ctx context.Context, userId string) (dto.UserResponse, error) {
-	user, err := s.userRepo.GetUserById(ctx, nil, userId)
+	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		return dto.UserResponse{}, dto.ErrGetUserById
 	}
@@ -271,7 +271,7 @@ func (s *userService) GetUserById(ctx context.Context, userId string) (dto.UserR
 }
 
 func (s *userService) GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error) {
-	emails, err := s.userRepo.GetUserByEmail(ctx, nil, email)
+	emails, err := s.userRepo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return dto.UserResponse{}, dto.ErrGetUserByEmail
 	}
@@ -288,7 +288,7 @@ func (s *userService) GetUserByEmail(ctx context.Context, email string) (dto.Use
 }
 
 func (s *userService) UpdateUser(ctx context.Context, req dto.UserUpdateRequest, userId string) (dto.UserUpdateResponse, error) {
-	user, err := s.userRepo.GetUserById(ctx, nil, userId)
+	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		return dto.UserUpdateResponse{}, dto.ErrUserNotFound
 	}
@@ -301,7 +301,7 @@ func (s *userService) UpdateUser(ctx context.Context, req dto.UserUpdateRequest,
 		Email:      req.Email,
 	}
 
-	userUpdate, err := s.userRepo.UpdateUser(ctx, nil, data)
+	userUpdate, err := s.userRepo.UpdateUser(ctx, data)
 	if err != nil {
 		return dto.UserUpdateResponse{}, dto.ErrUpdateUser
 	}
@@ -317,12 +317,12 @@ func (s *userService) UpdateUser(ctx context.Context, req dto.UserUpdateRequest,
 }
 
 func (s *userService) DeleteUser(ctx context.Context, userId string) error {
-	user, err := s.userRepo.GetUserById(ctx, nil, userId)
+	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		return dto.ErrUserNotFound
 	}
 
-	err = s.userRepo.DeleteUser(ctx, nil, user.ID.String())
+	err = s.userRepo.DeleteUser(ctx, user.ID.String())
 	if err != nil {
 		return dto.ErrDeleteUser
 	}
@@ -331,7 +331,7 @@ func (s *userService) DeleteUser(ctx context.Context, userId string) error {
 }
 
 func (s *userService) Verify(ctx context.Context, req dto.UserLoginRequest) (dto.UserLoginResponse, error) {
-	check, flag, err := s.userRepo.CheckEmail(ctx, nil, req.Email)
+	check, flag, err := s.userRepo.CheckEmail(ctx, req.Email)
 	if err != nil || !flag {
 		return dto.UserLoginResponse{}, dto.ErrEmailNotFound
 	}

@@ -11,13 +11,13 @@ import (
 
 type (
 	UserRepository interface {
-		RegisterUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
-		GetAllUserWithPagination(ctx context.Context, tx *gorm.DB, req dto.PaginationRequest) (dto.GetAllUserRepositoryResponse, error)
-		GetUserById(ctx context.Context, tx *gorm.DB, userId string) (entity.User, error)
-		GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error)
-		CheckEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, bool, error)
-		UpdateUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
-		DeleteUser(ctx context.Context, tx *gorm.DB, userId string) error
+		RegisterUser(ctx context.Context, user entity.User) (entity.User, error)
+		GetAllUserWithPagination(ctx context.Context, req dto.PaginationRequest) (dto.GetAllUserRepositoryResponse, error)
+		GetUserById(ctx context.Context, userId string) (entity.User, error)
+		GetUserByEmail(ctx context.Context, email string) (entity.User, error)
+		CheckEmail(ctx context.Context, email string) (entity.User, bool, error)
+		UpdateUser(ctx context.Context, user entity.User) (entity.User, error)
+		DeleteUser(ctx context.Context, userId string) error
 	}
 
 	userRepository struct {
@@ -31,10 +31,8 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	}
 }
 
-func (r *userRepository) RegisterUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error) {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) RegisterUser(ctx context.Context, user entity.User) (entity.User, error) {
+	tx := r.db
 
 	if err := tx.WithContext(ctx).Create(&user).Error; err != nil {
 		return entity.User{}, err
@@ -43,10 +41,8 @@ func (r *userRepository) RegisterUser(ctx context.Context, tx *gorm.DB, user ent
 	return user, nil
 }
 
-func (r *userRepository) GetAllUserWithPagination(ctx context.Context, tx *gorm.DB, req dto.PaginationRequest) (dto.GetAllUserRepositoryResponse, error) {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) GetAllUserWithPagination(ctx context.Context, req dto.PaginationRequest) (dto.GetAllUserRepositoryResponse, error) {
+	tx := r.db
 
 	var users []entity.User
 	var err error
@@ -81,10 +77,8 @@ func (r *userRepository) GetAllUserWithPagination(ctx context.Context, tx *gorm.
 	}, err
 }
 
-func (r *userRepository) GetUserById(ctx context.Context, tx *gorm.DB, userId string) (entity.User, error) {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) GetUserById(ctx context.Context, userId string) (entity.User, error) {
+	tx := r.db
 
 	var user entity.User
 	if err := tx.WithContext(ctx).Where("id = ?", userId).Take(&user).Error; err != nil {
@@ -94,10 +88,8 @@ func (r *userRepository) GetUserById(ctx context.Context, tx *gorm.DB, userId st
 	return user, nil
 }
 
-func (r *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error) {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) GetUserByEmail(ctx context.Context, email string) (entity.User, error) {
+	tx := r.db
 
 	var user entity.User
 	if err := tx.WithContext(ctx).Where("email = ?", email).Take(&user).Error; err != nil {
@@ -107,10 +99,8 @@ func (r *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email 
 	return user, nil
 }
 
-func (r *userRepository) CheckEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, bool, error) {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) CheckEmail(ctx context.Context, email string) (entity.User, bool, error) {
+	tx := r.db
 
 	var user entity.User
 	if err := tx.WithContext(ctx).Where("email = ?", email).Take(&user).Error; err != nil {
@@ -120,10 +110,8 @@ func (r *userRepository) CheckEmail(ctx context.Context, tx *gorm.DB, email stri
 	return user, true, nil
 }
 
-func (r *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error) {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) UpdateUser(ctx context.Context, user entity.User) (entity.User, error) {
+	tx := r.db
 
 	if err := tx.WithContext(ctx).Updates(&user).Error; err != nil {
 		return entity.User{}, err
@@ -132,10 +120,8 @@ func (r *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user entit
 	return user, nil
 }
 
-func (r *userRepository) DeleteUser(ctx context.Context, tx *gorm.DB, userId string) error {
-	if tx == nil {
-		tx = r.db
-	}
+func (r *userRepository) DeleteUser(ctx context.Context, userId string) error {
+	tx := r.db
 
 	if err := tx.WithContext(ctx).Delete(&entity.User{}, "id = ?", userId).Error; err != nil {
 		return err
