@@ -2,3 +2,5 @@
 storage/
 assets/
 volumes/
+tmp/
+bin/
